@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <meta charset=UTF-8>
+<body>
+
+<script type=module>
+    import {dump} from 'https://cdn.jsdelivr.net/gh/nuxodin/dump.js@1.2.1/mod.min.js';
+    import {diagnose, collectInputs} from  './diagnose.js';
+
+    collectInputs();
+    setTimeout(() => {
+        let props = diagnose();
+        out.innerHTML = dump(props);
+    }, 4000);
+</script>
+
+<div id="out"></div>
