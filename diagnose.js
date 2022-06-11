@@ -115,7 +115,39 @@ export function diagnose(){
     
     // performance
     res.performance = performance.getEntriesByType("navigation")[0];
-    
+
+    /*
+    // window properties
+    res.window = {
+        innerHeight: window.innerHeight,
+        innerWidth: window.innerWidth,
+        outerHeight: window.outerHeight,
+        outerWidth: window.outerWidth,
+        screenX: window.screenX,
+        screenY: window.screenY,
+        scrollX: window.scrollX,
+        scrollY: window.scrollY,
+        pageXOffset: window.pageXOffset,
+        pageYOffset: window.pageYOffset,
+        screenLeft: window.screenLeft,
+        screenTop: window.screenTop,
+        screenAvailLeft: window.screenAvailLeft,
+        screenAvailTop: window.screenAvailTop,
+        screenAvailHeight: window.screenAvailHeight,
+        screenAvailWidth: window.screenAvailWidth,
+        outerWidth: window.outerWidth,
+        outerHeight: window.outerHeight,
+        devicePixelRatio: window.devicePixelRatio,
+        clientWidth: window.clientWidth,
+        clientHeight: window.clientHeight,
+        scrollMaxX: window.scrollMaxX,
+        scrollMaxY: window.scrollMaxY,
+        scrollbarWidth: window.scrollbarWidth,
+        scrollbarHeight: window.scrollbarHeight,
+    };
+    */
+
+
     res.inputs = inputs;    
     
     return res;
