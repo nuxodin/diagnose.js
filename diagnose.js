@@ -1,5 +1,5 @@
 export function diagnose(){
-    const res = {};
+    let res = {};
 
     // media queries
     const queries = [
@@ -59,62 +59,19 @@ export function diagnose(){
         let match = matchMedia('('+query+')');
         let matches = match.matches;
         if (match.media === 'not all') matches = null;
-    
         res.media[query] = matches;
     }
-    
-    
-    // navigator porpoerties
-    /*
-    var props = Object.getOwnPropertyNames(Navigator.prototype);
-    console.log(props)
-    let nav = {};
-    for (let prop of props) {
-        let value = navigator[prop];
-        if (typeof value === 'function') continue;
-        nav[prop] = value;
-    }
-    */
-    res.devicePixelRatio = window.devicePixelRatio;
 
-    res.navigator = {
-        appCodeName: navigator.appCodeName,
-        appName: navigator.appName,
-        appVersion: navigator.appVersion,
-        cookieEnabled: navigator.cookieEnabled,
-        connection: navigator.connection,
-        doNotTrack: navigator.doNotTrack,
-        hardwareConcurrency: navigator.hardwareConcurrency,
-        language: navigator.language,
-        languages: navigator.languages,
-        maxTouchPoints: navigator.maxTouchPoints,
-        onLine: navigator.onLine,
-        oscpu: navigator.oscpu,
-        pdfViewerEnabled: navigator.pdfViewerEnabled,
-        platform: navigator.platform,
-        product: navigator.product,
-        productSub: navigator.productSub,
-        userAgent: navigator.userAgent,
-        vendor: navigator.vendor,
-        vendorSub: navigator.vendorSub,
-    };
-    
-    
-    // screen properties
-    res.screen = {
-        availWidth: screen.availWidth,
-        availHeight: screen.availHeight,
-        width: screen.width,
-        height: screen.height,
-        colorDepth: screen.colorDepth,
-        pixelDepth: screen.pixelDepth,
-        "orientation.type": screen.orientation.type,
-        "orientation.angle": screen.orientation.angle,
-        isExtended: screen.isExtended,    
-    }
-    
+
+    res.devicePixelRatio = window.devicePixelRatio;
+    res.navigator = getProperties(navigator);
+    res.screen = getProperties(screen);
+    res.visualViewport = getProperties(window.visualViewport);
+
     // performance
     res.performance = performance.getEntriesByType("navigation")[0];
+
+    //res = flat(res);
 
     /*
     // window properties
@@ -148,12 +105,19 @@ export function diagnose(){
     */
 
 
-    res.inputs = inputs;    
-    
+    res.inputs = inputs;
+
     return res;
 }
 
 export function collectInputs(){
+    // keypresses
+    document.addEventListener('keydown', e => {
+        inputs.keyboard.push({
+            key: e.key,
+            time: e.timeStamp,
+        });
+    }, {passive: true} );
     // mouse movement
     document.addEventListener('mousemove', e => {
         inputs.mouse.push({
@@ -170,13 +134,6 @@ export function collectInputs(){
             time: e.timeStamp,
         });
     }, {passive: true} );
-    // keypresses
-    document.addEventListener('keydown', e => {
-        inputs.keyboard.push({
-            key: e.key,
-            time: e.timeStamp,
-        });
-    }, {passive: true} );
 }
 
 const inputs = {
@@ -184,4 +141,74 @@ const inputs = {
     touch:[],
     //wheel:[],
     keyboard:[],
+}
+
+
+
+
+const used = new Set();
+
+function getProperties(obj){
+    let props = Object.create(null);
+
+    let currentProto = obj;
+    while (currentProto) {
+        if (currentProto===Object) break;
+        for (let prop of Object.getOwnPropertyNames(currentProto)) {
+
+            if (prop === '__proto__') continue;
+
+            let value = null;
+
+
+            try {
+                value = obj[prop]; // currentProto[prop].call(obj); // how to trigger the original getter?
+            } catch (e) {
+                value = e.message;
+            }
+
+            if (typeof value === 'function') continue;
+            if (value == null) continue;
+
+            if ({string:1,number:1,boolean:1}[typeof value] || value == null) {
+                props[prop] = value;
+                continue;
+            }
+            /*
+            if (Array.isArray(value)) continue;
+            */
+            if (typeof value === 'object') {
+                if (value instanceof Node) continue;
+
+                if (used.has(value)) continue;
+                used.add(value);
+                value = getProperties(value);
+                if (Object.keys(value).length === 0) continue;
+                props[prop] = value;
+                continue;
+            }
+        }
+        currentProto = Object.getPrototypeOf(currentProto);
+    }
+    return props;
+
+}
+
+
+function flat(obj){
+    let nObj = {};
+    run(obj,'');
+    return nObj;
+
+    function run(obj, prefix){
+        for (let key in obj) {
+            let value = obj[key];
+            if (typeof value === 'object') {
+                run(value, prefix+key+'.');
+                continue;
+            }
+            nObj[prefix+key] = value;
+        }
+    }
+
 }

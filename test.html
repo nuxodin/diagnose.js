@@ -11,8 +11,10 @@
     collectInputs();
     setTimeout(() => {
         let props = diagnose();
+        console.log(props)
+
         out.innerHTML = dump(props);
-    }, 4000);
+    }, 2000);
 </script>
 
 <div id="out"></div>
