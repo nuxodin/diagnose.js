@@ -1,5 +1,5 @@
 export function diagnose(){
-    let res = {};
+    const res = {};
 
     // media queries
     const queries = [
@@ -55,9 +55,9 @@ export function diagnose(){
         'update:slow',
     ];
     res.media = {};
-    for (let query of queries) {
-        let match = matchMedia('('+query+')');
-        let matches = match.matches;
+    for (const query of queries) {
+        const match = matchMedia('('+query+')');
+        const matches = match.matches;
         if (match.media === 'not all') matches = null;
         res.media[query] = matches;
     }
@@ -149,12 +149,12 @@ const inputs = {
 const used = new Set();
 
 function getProperties(obj){
-    let props = Object.create(null);
+    const props = Object.create(null);
 
     let currentProto = obj;
     while (currentProto) {
         if (currentProto===Object) break;
-        for (let prop of Object.getOwnPropertyNames(currentProto)) {
+        for (const prop of Object.getOwnPropertyNames(currentProto)) {
 
             if (prop === '__proto__') continue;
 
@@ -196,13 +196,13 @@ function getProperties(obj){
 
 
 function flat(obj){
-    let nObj = {};
+    const nObj = {};
     run(obj,'');
     return nObj;
 
     function run(obj, prefix){
-        for (let key in obj) {
-            let value = obj[key];
+        for (const key in obj) {
+            const value = obj[key];
             if (typeof value === 'object') {
                 run(value, prefix+key+'.');
                 continue;
