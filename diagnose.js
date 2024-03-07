@@ -144,7 +144,9 @@ const inputs = {
 }
 
 
-
+// todo extensions:
+// facbook container
+// property "--fbc-blue-60" on body
 
 const used = new Set();
 
